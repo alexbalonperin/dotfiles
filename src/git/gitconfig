@@ -216,10 +216,11 @@
 
     path = ~/.gitconfig.local
 [credential]
-	helper = store
+	helper = osxkeychain
 
 [pull]
 	ff = only
+	rebase = true
 
 [commit]
 	gpgsign = true
@@ -228,3 +229,5 @@
 	gpgSign = true
 [gpg]
 	program = gpg
+[init]
+	defaultBranch = main
