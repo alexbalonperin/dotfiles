@@ -175,191 +175,18 @@ vim.opt.rtp:prepend(lazypath)
 ----------------------------------
 require("lazy").setup({
   {
-    "yetone/avante.nvim",
-    enabled = true,
-    event = "VeryLazy",
-    lazy = false,
-    version = false, -- Set this to "*" to always pull the latest release version, or set it to false to update to the latest code changes.
-    opts = {
-      provider = "ollama",
-      vendors = {
-        ollama = {
-          __inherited_from = "openai",
-          api_key_name = "",
-          endpoint = "http://127.0.0.1:11434/v1",
-          model = "deepseek-r1:latest",
-          disable_tools = true,
-        },
-      },
-      -- WARNING: Since auto-suggestions are a high-frequency operation and therefore expensive,
-      -- currently designating it as `copilot` provider is dangerous because: https://github.com/yetone/avante.nvim/issues/1048
-      -- Of course, you can reduce the request frequency by increasing `suggestion.debounce`.
-      auto_suggestions_provider = "ollama",
-      behaviour = {
-        auto_suggestions = false, -- Experimental stage
-        auto_set_highlight_group = true,
-        auto_set_keymaps = true,
-        auto_apply_diff_after_generation = false,
-        support_paste_from_clipboard = false,
-        minimize_diff = true, -- Whether to remove unchanged lines when applying a code block
-      },
-      mappings = {
-        --- @class AvanteConflictMappings
-        diff = {
-          ours = "co",
-          theirs = "ct",
-          all_theirs = "ca",
-          both = "cb",
-          cursor = "cc",
-          next = "]x",
-          prev = "[x",
-        },
-        suggestion = {
-          accept = "<M-l>",
-          next = "<M-]>",
-          prev = "<M-[>",
-          dismiss = "<C-]>",
-        },
-        jump = {
-          next = "]]",
-          prev = "[[",
-        },
-        submit = {
-          normal = "<CR>",
-          insert = "<C-s>",
-        },
-        sidebar = {
-          apply_all = "A",
-          apply_cursor = "a",
-          switch_windows = "<Tab>",
-          reverse_switch_windows = "<S-Tab>",
-        },
-      },
-      hints = { enabled = true },
-      windows = {
-        ---@type "right" | "left" | "top" | "bottom"
-        position = "right", -- the position of the sidebar
-        wrap = true, -- similar to vim.o.wrap
-        width = 30, -- default % based on available width
-        sidebar_header = {
-          enabled = true, -- true, false to enable/disable the header
-          align = "center", -- left, center, right for title
-          rounded = true,
-        },
-        input = {
-          prefix = "> ",
-          height = 8, -- Height of the input window in vertical layout
-        },
-        edit = {
-          border = "rounded",
-          start_insert = true, -- Start insert mode when opening the edit window
-        },
-        ask = {
-          floating = false, -- Open the 'AvanteAsk' prompt in a floating window
-          start_insert = true, -- Start insert mode when opening the ask window
-          border = "rounded",
-          ---@type "ours" | "theirs"
-          focus_on_apply = "ours", -- which diff to focus after applying
-        },
-      },
-      highlights = {
-        ---@type AvanteConflictHighlights
-        diff = {
-          current = "DiffText",
-          incoming = "DiffAdd",
-        },
-      },
-      --- @class AvanteConflictUserConfig
-      diff = {
-        autojump = true,
-        ---@type string | fun(): any
-        list_opener = "copen",
-        --- Override the 'timeoutlen' setting while hovering over a diff (see :help timeoutlen).
-        --- Helps to avoid entering operator-pending mode with diff mappings starting with `c`.
-        --- Disable by setting to -1.
-        override_timeoutlen = 500,
-      },
-      suggestion = {
-        debounce = 600,
-        throttle = 600,
-      },
-    },
-    -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
-    build = "make",
-    -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
-    dependencies = {
-      "stevearc/dressing.nvim",
-      "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim",
-      --- The below dependencies are optional,
-      "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
-      "ibhagwan/fzf-lua", -- for file_selector provider fzf
-      "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
-      "zbirenbaum/copilot.lua", -- for providers='copilot'
-      {
-        -- support for image pasting
-        "HakonHarnes/img-clip.nvim",
-        event = "VeryLazy",
-        opts = {
-          -- recommended settings
-          default = {
-            embed_image_as_base64 = false,
-            prompt_for_file_name = false,
-            drag_and_drop = {
-              insert_mode = true,
-            },
-            -- required for Windows users
-            use_absolute_path = true,
-          },
-        },
-      },
-      {
-        -- Make sure to set this up properly if you have lazy=true
-        'MeanderingProgrammer/render-markdown.nvim',
-        opts = {
-          file_types = { "markdown", "Avante" },
-        },
-        ft = { "markdown", "Avante" },
-      },
-    },
-  },
-  {
     "williamboman/mason.nvim",
     config = function()
       require("mason").setup()
     end
   },
   {
-    "williamboman/mason-lspconfig.nvim",
-    config = function()
-      local mason_lsp = require('mason-lspconfig')
-      mason_lsp.setup({
-        ensure_installed = {
-          'bashls',
-          'cssls',
-          'eslint',
-          'html',
-          'jsonls',
-          'lua_ls',
-          'pyright',
-          'rust_analyzer',
-          'sqlls',
-          -- managed by typescript-tools
-          'ts_ls',
-        },
-        automatic_installation = true,
-      })
-      mason_lsp.setup_handlers({
-        -- default setup for all servers (without a key)
-        function(server_name)
-          require('lspconfig')[server_name].setup({})
-        end,
-       -- LSP specific handlers
-        ['ts_ls'] = function()
-          -- do nothing, managed by typescript-tools
-        end
-      })
-    end,
+      "mason-org/mason-lspconfig.nvim",
+      opts = {},
+      dependencies = {
+          { "mason-org/mason.nvim", opts = {} },
+          "neovim/nvim-lspconfig",
+      },
   },
   {
     "hrsh7th/nvim-cmp",
@@ -448,6 +275,7 @@ require("lazy").setup({
       metals_config.settings = {
         showImplicitArguments = true,
         excludedPackages = { "akka.actor.typed.javadsl", "com.github.swagger.akka.javadsl" },
+        bloopVersion = "2.0.13",
       }
 
       -- *READ THIS*
@@ -548,14 +376,131 @@ require("lazy").setup({
       })
     end
   },
-  { "junegunn/fzf", build = "./install --bin" },
+  {
+      "ldelossa/gh.nvim",
+      dependencies = {
+          {
+          "ldelossa/litee.nvim",
+          config = function()
+              require("litee.lib").setup()
+          end,
+          },
+      },
+      config = function()
+          require("litee.gh").setup()
+      end,
+  },
+  {
+    "folke/snacks.nvim",
+    dependencies = {
+      "ldelossa/gh.nvim",
+    },
+    priority = 1000,
+    lazy = false,
+    ---@type snacks.Config
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+      bigfile = { enabled = true },
+      dashboard = {
+        enabled = true,
+        sections = {
+          { section = "header" },
+          {
+            pane = 2,
+            section = "terminal",
+            cmd = "colorscript -e square",
+            height = 5,
+            padding = 1,
+          },
+          { section = "keys", gap = 1, padding = 1 },
+          {
+            pane = 2,
+            icon = " ",
+            desc = "Browse Repo",
+            padding = 1,
+            key = "b",
+            action = function()
+              Snacks.gitbrowse()
+            end,
+          },
+          function()
+            local in_git = Snacks.git.get_root() ~= nil
+            local cmds = {
+              {
+                title = "Open Issues",
+                cmd = "gh issue list -L 5",
+                key = "i",
+                action = function()
+                  vim.fn.jobstart("gh issue list --web", { detach = true })
+                end,
+                icon = " ",
+                height = 7,
+              },
+              {
+                icon = " ",
+                title = "Open PRs",
+                cmd = "gh pr list -L 5",
+                key = "P",
+                action = function()
+                  vim.fn.jobstart("gh pr list --web", { detach = true })
+                end,
+                height = 10,
+              },
+              {
+                icon = " ",
+                title = "Git Status",
+                cmd = "git --no-pager diff --stat -B -M -C",
+                height = 10,
+              },
+            }
+            return vim.tbl_map(function(cmd)
+              return vim.tbl_extend("force", {
+                pane = 2,
+                section = "terminal",
+                enabled = in_git,
+                padding = 1,
+                ttl = 5 * 60,
+                indent = 3,
+              }, cmd)
+            end, cmds)
+          end,
+          { section = "startup" },
+        },
+      },
+      explorer = { enabled = false },
+      indent = { enabled = false },
+      input = { enabled = false },
+      picker = { enabled = false },
+      notifier = { enabled = true },
+      quickfile = { enabled = false },
+      scope = { enabled = false },
+      scroll = { enabled = false },
+      statuscolumn = { enabled = false },
+      terminal = { enabled = false },
+      words = { enabled = false },
+    },
+  },
   {
     "ibhagwan/fzf-lua",
     -- optional for icon support
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+      { "junegunn/fzf", build = "./install --bin" },
+    },
     config = function()
       -- calling `setup` is optional for customization
-      require("fzf-lua").setup({})
+      require("fzf-lua").setup({
+        files = {
+          cmd = 'rg --files --line-number --column'
+
+        },  -- Previewers options
+        grep = {
+          cmd = 'rg --vimgrep',
+          rg_opts = "--line-number --column --no-heading --color=always --smart-case --max-columns=4096 -e --glob !*.png --glob !node_modules/*",
+        },
+      })
 
       map('n', '<leader>ss', ':FzfLua live_grep<CR>')
       map('n', ':Ag', ':FzfLua live_grep<CR>')
@@ -571,15 +516,18 @@ require("lazy").setup({
       map('n', '<leader>f', ':NERDTreeFind <CR>')
     end
   },
-  {'sjl/gundo.vim'},
+  -- {'sjl/gundo.vim'},
   {
     'tpope/vim-fugitive',
     config = function()
-      map('n', '<leader>d', ':Gdiffsplit<cr>')
+      map('n', '<leader>hd', ':Ghdiffsplit<cr>')
+      map('n', '<leader>vd', ':Gvdiffsplit<cr>')
       map('n', '<leader>v', ':Gvsplit<cr>')
       map('n', '<leader>h', ':Gsplit<cr>')
       map('n', '<leader>g', ':Git<cr>')
       map('n', '<leader>gl', ':Git l<cr>')
+      map('n', '<leader>gs', ':Git status<cr>')
+      map('n', '<leader>gb', ':Git blame<cr>')
     end
   },
   {'tpope/vim-repeat'},
@@ -631,7 +579,6 @@ require("lazy").setup({
       }
     end
   },
-  {'tpope/vim-abolish'},
   {'dense-analysis/ale'}, -- Manages js/ts linting through the .eslintrc.js or tslint.json file
   {'hashivim/vim-terraform'},
   --{'leafgarland/typescript-vim'},
@@ -689,7 +636,7 @@ require("lazy").setup({
           --map("n", "gr", "<CMD>TSToolsFileReferences<CR>", opts)
           map("n", "gn", ":TSToolsRenameFile<CR>", opts)
           map("n", "gf", ":TSToolsFixAll<CR>", opts)
-          --map("n", "gi", "<CMD>TSToolsAddMissingImports<CR>", opts)
+          map("n", "ga", "<CMD>TSToolsAddMissingImports<CR>", opts)
           --map("n", "go", "<CMD>TSToolsOrganizeImports<CR>", opts)
         end,
         handlers = {
@@ -754,28 +701,29 @@ require("lazy").setup({
     },
   },
   {
-    "zbirenbaum/copilot.lua",
-    cmd = "Copilot",
-    event = "InsertEnter",
-    config = function()
-      require("copilot").setup({
-        panel = { enabled = false },
-        suggestion = { enabled = false },
-        filetypes = {
-          yaml = false,
-          markdown = false,
-          help = false,
-          gitcommit = false,
-          gitrebase = false,
-          hgcommit = false,
-          svn = false,
-          cvs = false,
-          ["."] = false,
-        },
-        copilot_node_command = 'node', -- Node.js version must be > 18.x
-        server_opts_overrides = {},
-      })
-    end,
+    "coder/claudecode.nvim",
+    tag = "v0.3.0",
+    dependencies = { "folke/snacks.nvim" },
+    config = true,
+    keys = {
+      { "<leader>a", nil, desc = "AI/Claude Code" },
+      { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
+      { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
+      { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
+      { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
+      { "<leader>am", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Claude model" },
+      { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
+      { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
+      {
+        "<leader>as",
+        "<cmd>ClaudeCodeTreeAdd<cr>",
+        desc = "Add file",
+        ft = { "NvimTree", "neo-tree", "oil", "minifiles" },
+      },
+      -- Diff management
+      { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+      { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+    },
   },
   {
       "hrsh7th/nvim-cmp",
@@ -815,8 +763,8 @@ require("lazy").setup({
             snippet = {
               -- REQUIRED - you must specify a snippet engine
               expand = function(args)
-                vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-                -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+                -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+                require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
                 -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
                 -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
               end,
@@ -834,7 +782,7 @@ require("lazy").setup({
             }),
             sources = cmp.config.sources({
               { name = 'nvim_lsp' },
-              { name = 'copilot', index = 2 },
+              -- { name = 'copilot', index = 2 },
             }, {
               { name = 'buffer' },
             }),
@@ -849,18 +797,12 @@ require("lazy").setup({
                   luasnip = "[Snippet]",
                   buffer = "[Buffer]",
                   path = "[Path]",
-                  copilot = "[Copilot]",
+                  -- copilot = "[Copilot]",
                 })[entry.source.name]
                 return vim_item
               end,
             },
         })
-      end,
-  },
-  {
-      "zbirenbaum/copilot-cmp",
-      config = function()
-          require("copilot_cmp").setup({})
       end,
   },
 })
