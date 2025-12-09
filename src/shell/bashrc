@@ -8,6 +8,7 @@
 export SBT_OPTS="-Xmx4G -Xss2M"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
 eval '
 _direnv_hook() {
   local previous_exit_status=$?;
@@ -21,15 +22,13 @@ fi'
 
 complete -C /usr/bin/terraform terraform
 
-# pnpm
-export PNPM_HOME="/home/alex/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
-
 # You should store all secrets in a local .secrets file
 if [ -f "$HOME/.secrets" ]; then
     source "$HOME/.secrets"
 fi
+
+
+. "$HOME/.local/bin/env"
+. "$HOME/.cargo/env"
+
+export PYTHONNOUSERSITE=True

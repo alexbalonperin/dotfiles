@@ -4,10 +4,10 @@
 
 enable_color_support() {
 
-    if [[ $COLORTERM == gnome-* && $TERM == xterm ]] \
-        && infocmp gnome-256color &> /dev/null; then
+    # Skip slow infocmp checks - assume 256 color support on modern terminals
+    if [[ $COLORTERM == gnome-* && $TERM == xterm ]]; then
         export TERM="gnome-256color"
-    elif infocmp xterm-256color &> /dev/null; then
+    elif [[ $TERM == xterm ]]; then
         export TERM="xterm-256color"
     fi
 
@@ -99,8 +99,9 @@ get_git_repository_details() {
 
 set_prompts() {
 
-    local bold=$(tput bold 2> /dev/null)
-    local reset=$(tput sgr0 2> /dev/null)
+    # Use direct ANSI escape codes instead of slow tput calls
+    local bold=$'\033[1m'
+    local reset=$'\033[0m'
 
     local cyan=""
     local green=""
@@ -110,18 +111,15 @@ set_prompts() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    if [ "$(tput colors 2> /dev/null || printf "0")" -ge 256 ]; then
+    # Assume 256 color support on modern terminals - skip slow tput colors check
+    # Solarized colors using ANSI 256-color codes
+    # https://github.com/altercation/solarized/tree/master/iterm2-colors-solarized#the-values
 
-        # Solarized colors.
-        # https://github.com/altercation/solarized/tree/master/iterm2-colors-solarized#the-values
-
-        cyan=$(tput setaf 37)
-        green=$(tput setaf 64)
-        orange=$(tput setaf 166)
-        white=$(tput setaf 15)
-        yellow=$(tput setaf 136)
-
-    fi
+    cyan=$'\033[38;5;37m'
+    green=$'\033[38;5;64m'
+    orange=$'\033[38;5;166m'
+    white=$'\033[38;5;15m'
+    yellow=$'\033[38;5;136m'
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -188,9 +186,8 @@ set_prompts() {
     #      │       └─ seconds since 1970-01-01 00:00:00 UTC
     #      └─ depth-level of the subshell
 
-    PS4="+$( tput cr 2> /dev/null;
-             tput cuf 6 2> /dev/null;
-             printf "%s" "$reset" )"
+    # Use ANSI codes directly instead of tput
+    PS4="+$( printf '\r      %s' "$reset" )"
 
     export PS4
 
