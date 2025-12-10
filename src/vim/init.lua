@@ -493,12 +493,12 @@ require("lazy").setup({
       -- calling `setup` is optional for customization
       require("fzf-lua").setup({
         files = {
-          cmd = 'rg --files --line-number --column'
-
-        },  -- Previewers options
+          cmd = 'rg --files'
+        },
         grep = {
           cmd = 'rg --vimgrep',
           rg_opts = "--line-number --column --no-heading --color=always --smart-case --max-columns=4096 -e --glob !*.png --glob !node_modules/*",
+          silent = true,
         },
       })
 
